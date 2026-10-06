@@ -1,5 +1,14 @@
+@tool
 class_name ArenaMap
 extends Node3D
+
+const GENERATED_ROOT_NAME := "__GeneratedArena"
+
+@export_tool_button("Bake Arena Into Scene")
+var bake_arena_button: Callable = bake_arena
+
+@export_tool_button("Clear Baked Arena")
+var clear_arena_button: Callable = clear_baked_arena
 
 const HEALTH_SCENE := preload("res://scenes/pickups/health_pickup.tscn")
 const ARMOR_SCENE := preload("res://scenes/pickups/armor_pickup.tscn")
@@ -13,16 +22,65 @@ const WALL_COLOR := Color(0.11, 0.14, 0.2)
 const COVER_COLOR := Color(0.35, 0.24, 0.16)
 const EDGE_COLOR := Color(0.13, 0.52, 0.64)
 
-
 func _ready() -> void:
-	_build_lighting()
-	_build_geometry()
-	_build_spawns()
-	_build_pickups()
-	_build_kill_volume()
+	# Never build automatically just because the scene opened in the editor.
+	if Engine.is_editor_hint():
+		return
+
+	# Build at runtime only when the arena has not already been baked.
+	if not has_node(GENERATED_ROOT_NAME):
+		_create_arena()
+func bake_arena() -> void:
+	if not Engine.is_editor_hint():
+		return
+
+	clear_baked_arena(false)
+
+	var generated_root := _create_arena()
+	var scene_root := get_tree().edited_scene_root
+
+	_assign_editor_owner(generated_root, scene_root)
+	EditorInterface.mark_scene_as_unsaved()
 
 
-func _build_lighting() -> void:
+func clear_baked_arena(mark_unsaved: bool = true) -> void:
+	var generated_root := get_node_or_null(GENERATED_ROOT_NAME)
+
+	if generated_root == null:
+		return
+
+	remove_child(generated_root)
+	generated_root.free()
+
+	if mark_unsaved and Engine.is_editor_hint():
+		EditorInterface.mark_scene_as_unsaved()
+
+
+func _create_arena() -> Node3D:
+	var generated_root := Node3D.new()
+	generated_root.name = GENERATED_ROOT_NAME
+	add_child(generated_root)
+
+	_build_lighting(generated_root)
+	_build_geometry(generated_root)
+	_build_spawns(generated_root)
+	_build_pickups(generated_root)
+	_build_kill_volume(generated_root)
+
+	return generated_root
+
+
+func _assign_editor_owner(node: Node, scene_root: Node) -> void:
+	if node.owner == null:
+		node.owner = scene_root
+
+	for child in node.get_children():
+		# Preserve ownership belonging to instanced pickup scenes.
+		# Manually generated children normally have no owner.
+		if child.owner == null:
+			_assign_editor_owner(child, scene_root)
+
+func _build_lighting(parent: Node3D) -> void:
 	var world_environment := WorldEnvironment.new()
 	world_environment.name = "WorldEnvironment"
 	var environment := Environment.new()
@@ -32,7 +90,7 @@ func _build_lighting() -> void:
 	environment.ambient_light_color = Color(0.42, 0.48, 0.62)
 	environment.ambient_light_energy = 0.72
 	world_environment.environment = environment
-	add_child(world_environment)
+	parent.add_child(world_environment)
 
 	var sun := DirectionalLight3D.new()
 	sun.name = "ArenaSun"
@@ -40,7 +98,7 @@ func _build_lighting() -> void:
 	sun.light_color = Color(0.82, 0.9, 1.0)
 	sun.light_energy = 1.15
 	sun.shadow_enabled = true
-	add_child(sun)
+	parent.add_child(sun)
 
 	for light_data in [
 		[Vector3(-16, 8, 0), Color(0.2, 0.65, 1.0)],
@@ -52,13 +110,13 @@ func _build_lighting() -> void:
 		light.light_color = light_data[1]
 		light.omni_range = 18.0
 		light.light_energy = 2.2
-		add_child(light)
+		parent.add_child(light)
 
 
-func _build_geometry() -> void:
+func _build_geometry(parent: Node3D) -> void:
 	var geometry := Node3D.new()
 	geometry.name = "Geometry"
-	add_child(geometry)
+	parent.add_child(geometry)
 
 	_add_box(geometry, "CentralFloor", Vector3(0, -0.5, 0), Vector3(24, 1, 24), FLOOR_COLOR)
 	_add_box(geometry, "WestDeck", Vector3(-17, 3.5, 0), Vector3(10, 1, 15), UPPER_COLOR)
@@ -96,10 +154,10 @@ func _build_geometry() -> void:
 	_add_box(geometry, "CentralTrimSouth", Vector3(0, 0.08, 11.85), Vector3(24, 0.16, 0.3), EDGE_COLOR)
 
 
-func _build_spawns() -> void:
+func _build_spawns(parent: Node3D) -> void:
 	var spawns := Node3D.new()
 	spawns.name = "SpawnPoints"
-	add_child(spawns)
+	parent.add_child(spawns)
 	_add_spawn(spawns, "SpawnCentralNW", Vector3(-6, 1.0, -6), -0.75)
 	_add_spawn(spawns, "SpawnCentralSE", Vector3(6, 1.0, 6), 2.35)
 	_add_spawn(spawns, "SpawnWest", Vector3(-17, 5.0, -4), -1.57)
@@ -110,10 +168,10 @@ func _build_spawns() -> void:
 	_add_spawn(spawns, "SpawnEastNorth", Vector3(9, 1.0, -8), 0.9)
 
 
-func _build_pickups() -> void:
+func _build_pickups(parent: Node3D) -> void:
 	var pickups := Node3D.new()
 	pickups.name = "Pickups"
-	add_child(pickups)
+	parent.add_child(pickups)
 
 	_add_pickup(pickups, HEALTH_SCENE, "HealthCentral", Vector3(0, 1.15, 0))
 	_add_pickup(pickups, HEALTH_SCENE, "HealthSouth", Vector3(5, 2.15, 18))
@@ -138,7 +196,7 @@ func _build_pickups() -> void:
 	gauntlet.configure_weapon(3, 0, Color(1.0, 0.25, 0.2))
 
 
-func _build_kill_volume() -> void:
+func _build_kill_volume(parent: Node3D) -> void:
 	var hazard_visual := MeshInstance3D.new()
 	hazard_visual.name = "HazardVisual"
 	hazard_visual.position = Vector3(0, -9.5, 0)
@@ -146,7 +204,7 @@ func _build_kill_volume() -> void:
 	hazard_mesh.size = Vector3(70, 0.2, 70)
 	hazard_visual.mesh = hazard_mesh
 	hazard_visual.material_override = _make_material(Color(1.0, 0.04, 0.02, 0.32), true)
-	add_child(hazard_visual)
+	parent.add_child(hazard_visual)
 
 	var kill_volume := Area3D.new()
 	kill_volume.name = "KillVolume"
@@ -159,7 +217,7 @@ func _build_kill_volume() -> void:
 	shape.size = Vector3(80, 5, 80)
 	shape_node.shape = shape
 	kill_volume.add_child(shape_node)
-	add_child(kill_volume)
+	parent.add_child(kill_volume)
 
 
 func _add_box(
@@ -202,11 +260,19 @@ func _add_stairs(
 		var height := step_height * float(index + 1)
 		var center := start + direction * step_depth * float(index)
 		center.y += height * 0.5
+
 		var size := Vector3(width, height, step_depth)
+
 		if absf(direction.x) > 0.5:
 			size = Vector3(step_depth, height, width)
-		_add_box(parent, "%s_%02d" % [prefix, index], center, size, UPPER_COLOR)
 
+		_add_box(
+			parent,
+			"%s_%02d" % [prefix, index],
+			center,
+			size,
+			UPPER_COLOR
+		)
 
 func _add_spawn(parent: Node3D, spawn_name: String, spawn_position: Vector3, yaw: float) -> void:
 	var marker := Marker3D.new()
