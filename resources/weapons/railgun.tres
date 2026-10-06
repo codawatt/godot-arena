@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="RailgunWeapon" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/railgun.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+weapon_id = 0
+display_name = "Railgun"
+damage = 100.0
+range_meters = 120.0
+fire_rate = 0.8
+spread_degrees = 0.0
+pellet_count = 1
+ammo_cost = 1
+maximum_ammo = 20
+knockback = 8.0
+effect_duration = 0.22
+effect_color = Color(0.2, 0.9, 1, 1)

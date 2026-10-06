@@ -1,0 +1,45 @@
+[gd_scene load_steps=11 format=3]
+
+[ext_resource type="Script" path="res://scripts/main.gd" id="1_main"]
+[ext_resource type="PackedScene" path="res://scenes/arena_map.tscn" id="2_map"]
+[ext_resource type="Script" path="res://scripts/network/network_manager.gd" id="3_network"]
+[ext_resource type="Script" path="res://scripts/core/match_manager.gd" id="4_match"]
+[ext_resource type="Script" path="res://scripts/core/damage_system.gd" id="5_damage"]
+[ext_resource type="Script" path="res://scripts/weapons/weapon_system.gd" id="6_weapons"]
+[ext_resource type="Script" path="res://scripts/network/game_server.gd" id="7_server"]
+[ext_resource type="Script" path="res://scripts/network/game_client.gd" id="8_client"]
+[ext_resource type="Script" path="res://scripts/effects/weapon_effects.gd" id="9_effects"]
+[ext_resource type="PackedScene" path="res://scenes/ui/hud.tscn" id="10_hud"]
+[ext_resource type="PackedScene" path="res://scenes/ui/start_menu.tscn" id="11_menu"]
+
+[node name="Main" type="Node"]
+script = ExtResource("1_main")
+
+[node name="ArenaMap" parent="." instance=ExtResource("2_map")]
+
+[node name="Players" type="Node3D" parent="."]
+
+[node name="WeaponEffects" type="Node3D" parent="."]
+script = ExtResource("9_effects")
+
+[node name="NetworkManager" type="Node" parent="."]
+script = ExtResource("3_network")
+
+[node name="MatchManager" type="Node" parent="."]
+script = ExtResource("4_match")
+
+[node name="DamageSystem" type="Node" parent="."]
+script = ExtResource("5_damage")
+
+[node name="WeaponSystem" type="Node" parent="."]
+script = ExtResource("6_weapons")
+
+[node name="GameServer" type="Node" parent="."]
+script = ExtResource("7_server")
+
+[node name="GameClient" type="Node" parent="."]
+script = ExtResource("8_client")
+
+[node name="HUD" parent="." instance=ExtResource("10_hud")]
+
+[node name="StartMenu" parent="." instance=ExtResource("11_menu")]

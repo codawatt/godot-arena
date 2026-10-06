@@ -1,0 +1,135 @@
+[gd_scene load_steps=3 format=3]
+
+[ext_resource type="Script" path="res://scripts/ui/start_menu.gd" id="1"]
+
+[sub_resource type="StyleBoxFlat" id="Style_panel"]
+bg_color = Color(0.035, 0.05, 0.09, 0.97)
+border_width_left = 2
+border_width_top = 2
+border_width_right = 2
+border_width_bottom = 2
+border_color = Color(0.14, 0.65, 0.85, 0.9)
+corner_radius_top_left = 10
+corner_radius_top_right = 10
+corner_radius_bottom_right = 10
+corner_radius_bottom_left = 10
+
+[node name="StartMenu" type="CanvasLayer"]
+layer = 20
+script = ExtResource("1")
+
+[node name="Root" type="ColorRect" parent="."]
+layout_mode = 3
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+color = Color(0.01, 0.015, 0.03, 0.86)
+
+[node name="Center" type="CenterContainer" parent="Root"]
+layout_mode = 1
+anchors_preset = 15
+anchor_right = 1.0
+anchor_bottom = 1.0
+grow_horizontal = 2
+grow_vertical = 2
+
+[node name="Panel" type="PanelContainer" parent="Root/Center"]
+custom_minimum_size = Vector2(520, 0)
+layout_mode = 2
+theme_override_styles/panel = SubResource("Style_panel")
+
+[node name="Margin" type="MarginContainer" parent="Root/Center/Panel"]
+layout_mode = 2
+theme_override_constants/margin_left = 34
+theme_override_constants/margin_top = 28
+theme_override_constants/margin_right = 34
+theme_override_constants/margin_bottom = 28
+
+[node name="VBox" type="VBoxContainer" parent="Root/Center/Panel/Margin"]
+layout_mode = 2
+theme_override_constants/separation = 10
+
+[node name="Title" type="Label" parent="Root/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.3, 0.85, 1, 1)
+theme_override_font_sizes/font_size = 34
+text = "QUAKE ARENA // VERTICAL SLICE"
+horizontal_alignment = 1
+
+[node name="Subtitle" type="Label" parent="Root/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.65, 0.72, 0.82, 1)
+theme_override_font_sizes/font_size = 15
+text = "Server-authoritative WebSocket multiplayer • 2–8 players"
+horizontal_alignment = 1
+
+[node name="PlayerLabel" type="Label" parent="Root/Center/Panel/Margin/VBox"]
+layout_mode = 2
+text = "PLAYER NAME"
+
+[node name="PlayerName" type="LineEdit" parent="Root/Center/Panel/Margin/VBox"]
+layout_mode = 2
+text = "Ranger"
+max_length = 20
+placeholder_text = "Player name"
+
+[node name="AddressLabel" type="Label" parent="Root/Center/Panel/Margin/VBox"]
+layout_mode = 2
+text = "SERVER ADDRESS OR FULL WS/WSS URL"
+
+[node name="Address" type="LineEdit" parent="Root/Center/Panel/Margin/VBox"]
+layout_mode = 2
+text = "127.0.0.1"
+placeholder_text = "127.0.0.1 or wss://arena.example.com/ws"
+
+[node name="PortLabel" type="Label" parent="Root/Center/Panel/Margin/VBox"]
+layout_mode = 2
+text = "PORT"
+
+[node name="Port" type="LineEdit" parent="Root/Center/Panel/Margin/VBox"]
+layout_mode = 2
+text = "8910"
+placeholder_text = "8910"
+
+[node name="PrimaryButtons" type="HBoxContainer" parent="Root/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_constants/separation = 10
+alignment = 1
+
+[node name="Host" type="Button" parent="Root/Center/Panel/Margin/VBox/PrimaryButtons"]
+custom_minimum_size = Vector2(170, 44)
+layout_mode = 2
+text = "HOST GAME"
+
+[node name="Join" type="Button" parent="Root/Center/Panel/Margin/VBox/PrimaryButtons"]
+custom_minimum_size = Vector2(170, 44)
+layout_mode = 2
+text = "JOIN GAME"
+
+[node name="Dedicated" type="Button" parent="Root/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "START DEDICATED SERVER (THIS PROCESS)"
+
+[node name="Disconnect" type="Button" parent="Root/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 38)
+layout_mode = 2
+text = "DISCONNECT"
+
+[node name="Status" type="Label" parent="Root/Center/Panel/Margin/VBox"]
+custom_minimum_size = Vector2(0, 44)
+layout_mode = 2
+theme_override_colors/font_color = Color(1, 0.78, 0.32, 1)
+text = "Ready."
+horizontal_alignment = 1
+vertical_alignment = 1
+autowrap_mode = 2
+
+[node name="Help" type="Label" parent="Root/Center/Panel/Margin/VBox"]
+layout_mode = 2
+theme_override_colors/font_color = Color(0.56, 0.62, 0.72, 1)
+theme_override_font_sizes/font_size = 13
+text = "WASD move  •  Space jump/bhop  •  Mouse 1 fire  •  1–4 weapons\nWheel/Q/E switch  •  Tab scoreboard  •  Esc menu/release mouse"
+horizontal_alignment = 1

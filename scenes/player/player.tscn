@@ -1,0 +1,64 @@
+[gd_scene load_steps=8 format=3]
+
+[ext_resource type="Script" path="res://scripts/player/player.gd" id="1_player"]
+[ext_resource type="Script" path="res://scripts/player/player_controller.gd" id="2_controller"]
+
+[sub_resource type="CapsuleShape3D" id="CapsuleShape_player"]
+radius = 0.42
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="Material_body"]
+albedo_color = Color(0.28, 0.68, 1, 1)
+roughness = 0.72
+
+[sub_resource type="CapsuleMesh" id="CapsuleMesh_body"]
+material = SubResource("Material_body")
+radius = 0.42
+height = 1.8
+
+[sub_resource type="StandardMaterial3D" id="Material_weapon"]
+albedo_color = Color(0.2, 0.9, 1, 1)
+emission_enabled = true
+emission = Color(0.08, 0.35, 0.4, 1)
+
+[sub_resource type="BoxMesh" id="BoxMesh_weapon"]
+material = SubResource("Material_weapon")
+size = Vector3(0.22, 0.18, 0.72)
+
+[node name="Player" type="CharacterBody3D"]
+floor_stop_on_slope = false
+floor_constant_speed = true
+floor_snap_length = 0.25
+floor_max_angle = 0.872665
+script = ExtResource("1_player")
+
+[node name="CollisionShape3D" type="CollisionShape3D" parent="."]
+shape = SubResource("CapsuleShape_player")
+
+[node name="BodyMesh" type="MeshInstance3D" parent="."]
+mesh = SubResource("CapsuleMesh_body")
+
+[node name="NameLabel" type="Label3D" parent="."]
+position = Vector3(0, 1.25, 0)
+billboard = 1
+no_depth_test = true
+font_size = 32
+outline_size = 8
+text = "Player"
+
+[node name="Head" type="Node3D" parent="."]
+position = Vector3(0, 0.65, 0)
+
+[node name="Camera3D" type="Camera3D" parent="Head"]
+current = false
+fov = 90.0
+near = 0.05
+far = 250.0
+
+[node name="WeaponView" type="MeshInstance3D" parent="Head/Camera3D"]
+position = Vector3(0.36, -0.28, -0.72)
+rotation = Vector3(-0.08, 0, 0)
+mesh = SubResource("BoxMesh_weapon")
+
+[node name="PlayerController" type="Node" parent="."]
+script = ExtResource("2_controller")

@@ -1,0 +1,18 @@
+[gd_resource type="Resource" script_class="LightningGunWeapon" load_steps=2 format=3]
+
+[ext_resource type="Script" path="res://scripts/weapons/lightning_gun.gd" id="1"]
+
+[resource]
+script = ExtResource("1")
+weapon_id = 1
+display_name = "Lightning Gun"
+damage = 7.0
+range_meters = 24.0
+fire_rate = 12.0
+spread_degrees = 0.0
+pellet_count = 1
+ammo_cost = 1
+maximum_ammo = 150
+knockback = 1.2
+effect_duration = 0.09
+effect_color = Color(0.45, 0.65, 1, 1)
